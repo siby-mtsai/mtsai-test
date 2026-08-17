@@ -12,7 +12,7 @@ provider "aws" {
 }
 
 resource "aws_s3_bucket" "terraform_state" {
-  bucket = "siby-terraform-state-2026"
+  bucket = "siby-tf-state"
 }
 
 resource "aws_s3_bucket_versioning" "versioning" {
