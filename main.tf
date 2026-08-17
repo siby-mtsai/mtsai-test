@@ -2,17 +2,17 @@ provider "aws" {
   region = var.region
 }
 
-resource "aws_s3_bucket" "website_bucket" {
-  bucket = "siby-static-site-2026" # must be globally unique — pick your own
+resource "aws_s3_bucket" "nextjs_site" {
+  bucket = "siby-nextjs-site-2026"   # pick your own unique suffix
 
   tags = {
-    Name    = "siby-static-site"
-    Purpose = "learning-static-website"
+    Name    = "siby-nextjs-site"
+    Purpose = "learning-nextjs-hosting"
   }
 }
 
-resource "aws_s3_bucket_public_access_block" "website_access" {
-  bucket = aws_s3_bucket.website_bucket.id
+resource "aws_s3_bucket_public_access_block" "nextjs_access" {
+  bucket = aws_s3_bucket.nextjs_site.id
 
   block_public_acls       = false
   block_public_policy     = false
@@ -20,20 +20,20 @@ resource "aws_s3_bucket_public_access_block" "website_access" {
   restrict_public_buckets = false
 }
 
-resource "aws_s3_bucket_website_configuration" "website_config" {
-  bucket = aws_s3_bucket.website_bucket.id
+resource "aws_s3_bucket_website_configuration" "nextjs_website" {
+  bucket = aws_s3_bucket.nextjs_site.id
 
   index_document {
     suffix = "index.html"
   }
 
   error_document {
-    key = "error.html"
+    key = "404.html"
   }
 }
 
-resource "aws_s3_bucket_policy" "public_read" {
-  bucket = aws_s3_bucket.website_bucket.id
+resource "aws_s3_bucket_policy" "nextjs_public_read" {
+  bucket = aws_s3_bucket.nextjs_site.id
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -43,10 +43,10 @@ resource "aws_s3_bucket_policy" "public_read" {
         Effect    = "Allow"
         Principal = "*"
         Action    = "s3:GetObject"
-        Resource  = "${aws_s3_bucket.website_bucket.arn}/*"
+        Resource  = "${aws_s3_bucket.nextjs_site.arn}/*"
       }
     ]
   })
 
-  depends_on = [aws_s3_bucket_public_access_block.website_access]
+  depends_on = [aws_s3_bucket_public_access_block.nextjs_access]
 }
