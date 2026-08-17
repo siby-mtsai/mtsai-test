@@ -3,7 +3,7 @@ provider "aws" {
 }
 
 resource "aws_s3_bucket" "website_bucket" {
-  bucket = "siby-static-site-2026"   # must be globally unique — pick your own
+  bucket = "siby-static-site-2026" # must be globally unique — pick your own
 
   tags = {
     Name    = "siby-static-site"
