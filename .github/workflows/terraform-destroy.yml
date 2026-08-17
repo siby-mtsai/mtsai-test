@@ -1,9 +1,10 @@
-name: Terraform Deployment
+name: Terraform Destroy
 
-on: push
+on:
+  workflow_dispatch:
 
 jobs:
-  terraform:
+  destroy:
     runs-on: ubuntu-latest
 
     steps:
@@ -26,18 +27,5 @@ jobs:
       - name: Terraform Init
         run: terraform init
 
-      - name: Terraform Format Check
-        run: terraform fmt -check
-
-      - name: Terraform Validate
-        run: terraform validate
-
-      - name: Terraform Plan
-        run: terraform plan -no-color
-
-      - name: Terraform Apply
-        run: terraform apply -auto-approve
-
       - name: Terraform Destroy
-        if: contains(github.event.head_commit.message, '[destroy]')
         run: terraform destroy -auto-approve
