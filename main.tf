@@ -10,3 +10,12 @@ resource "aws_instance" "siby_instance" {
     Name = "text-siby-ec2-instance"
   }
 }
+
+resource "aws_s3_bucket" "name" {
+  bucket = "siby-learning-bucket-2026"
+
+  tags = {
+    Name    = "siby-learning-bucket"
+    Purpose = "learning-s3"
+  }
+}
