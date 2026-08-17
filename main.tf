@@ -3,7 +3,7 @@ provider "aws" {
 }
 
 resource "aws_s3_bucket" "nextjs_site" {
-  bucket = "siby-nextjs-site-2026"   # pick your own unique suffix
+  bucket = "siby-nextjs-site-2026" # pick your own unique suffix
 
   tags = {
     Name    = "siby-nextjs-site"
