@@ -3,7 +3,7 @@ provider "aws" {
 }
 
 resource "aws_instance" "my_ec2" {
-  ami           = "ami-0c02fb55956c7d316"
+  ami           = "ami-0ac7b260cf76d8865"
   instance_type = "t2.micro"
   key_name      = "siby-ec2-key-pair"
 
