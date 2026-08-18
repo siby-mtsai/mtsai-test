@@ -1,21 +1,11 @@
-data "aws_ami" "amazon_linux" {
-  most_recent = true
-  owners      = ["amazon"]
-
-  filter {
-    name   = "name"
-    values = ["al2023-ami-*-x86_64"]
-  }
-
-  filter {
-    name   = "virtualization-type"
-    values = ["hvm"]
-  }
+provider "aws" {
+  region = "ap-south-1"
 }
 
 resource "aws_instance" "my_ec2" {
-  ami           = data.aws_ami.amazon_linux.id
+  ami           = "ami-0c02fb55956c7d316"
   instance_type = "t2.micro"
+  key_name      = "siby-ec2-key-pair"
 
   tags = {
     Name = "MyFirstInstance"
