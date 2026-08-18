@@ -1,0 +1,49 @@
+name: Bootstrap Destroy
+on:
+  workflow_dispatch:   # manual trigger only — never on push
+jobs:
+  bootstrap-destroy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./bootstrap
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.10.0
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: ap-south-1
+
+      # Critical: restore the state saved from the last apply run
+      - name: Download terraform.tfstate artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: bootstrap-tfstate
+          path: bootstrap/
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Plan (destroy)
+        run: terraform plan -destroy -out=tfplan
+
+      - name: Terraform Destroy
+        run: terraform apply -auto-approve tfplan
+
+      # Optional: upload the post-destroy state too, in case anything remains
+      - name: Upload post-destroy terraform.tfstate as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: bootstrap-tfstate-post-destroy
+          path: bootstrap/terraform.tfstate
+          retention-days: 90
