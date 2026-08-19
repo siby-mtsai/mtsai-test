@@ -81,3 +81,7 @@ resource "aws_db_instance" "mtsai_db" {
     Name = "mtsai-db"
   }
 }
+
+output "db_endpoint" {
+  value = aws_db_instance.mtsai_db.endpoint
+}
