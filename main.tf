@@ -67,10 +67,9 @@ resource "aws_security_group" "rds_sg" {
 resource "aws_db_instance" "mtsai_db" {
   identifier             = "mtsai-db"
   engine                 = "postgres"
-  engine_version         = "16.3"
   instance_class         = "db.t3.micro"
   allocated_storage      = 20
-  db_name                = "mtsaidb-cms"
+  db_name                = "mtsaidb"
   username               = "mtsaiadmin"
   password               = "ChangeMe123!"
   db_subnet_group_name   = aws_db_subnet_group.mtsai_db_subnets.name
