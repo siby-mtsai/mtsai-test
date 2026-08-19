@@ -240,3 +240,48 @@ output "db_endpoint" {
 output "bastion_public_ip" {
   value = aws_instance.bastion.public_ip
 }
+
+# ---------------------------------------------------
+# NAT GATEWAY (lets private subnets reach the internet)
+# ---------------------------------------------------
+resource "aws_eip" "nat_eip" {
+  domain = "vpc"
+
+  tags = {
+    Name = "mtsai-nat-eip"
+  }
+}
+
+resource "aws_nat_gateway" "mtsai_nat" {
+  allocation_id = aws_eip.nat_eip.id
+  subnet_id     = aws_subnet.public_subnet.id
+
+  tags = {
+    Name = "mtsai-nat"
+  }
+
+  depends_on = [aws_internet_gateway.mtsai_igw]
+}
+
+resource "aws_route_table" "private_rt" {
+  vpc_id = aws_vpc.mtsai_vpc.id
+
+  route {
+    cidr_block     = "0.0.0.0/0"
+    nat_gateway_id = aws_nat_gateway.mtsai_nat.id
+  }
+
+  tags = {
+    Name = "private-rt"
+  }
+}
+
+resource "aws_route_table_association" "private_rt_assoc_1" {
+  subnet_id      = aws_subnet.private_subnet_1.id
+  route_table_id = aws_route_table.private_rt.id
+}
+
+resource "aws_route_table_association" "private_rt_assoc_2" {
+  subnet_id      = aws_subnet.private_subnet_2.id
+  route_table_id = aws_route_table.private_rt.id
+}
