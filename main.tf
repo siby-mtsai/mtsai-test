@@ -180,6 +180,44 @@ resource "aws_security_group" "bastion_sg" {
 }
 
 # ---------------------------------------------------
+# IAM ROLE - S3 READ ONLY ACCESS FOR EC2 (mtsai-cms)
+# ---------------------------------------------------
+
+# 1. The role itself - defines WHO can use it (EC2 service)
+resource "aws_iam_role" "s3_readonly_access_ec2" {
+  name = "S3ReadOnlyAccessEC2"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        }
+      }
+    ]
+  })
+
+  tags = {
+    Name = "S3ReadOnlyAccessEC2"
+  }
+}
+
+# 2. Attach AWS's built-in "S3 read-only" managed policy to the role
+resource "aws_iam_role_policy_attachment" "s3_readonly_attach" {
+  role       = aws_iam_role.s3_readonly_access_ec2.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"
+}
+
+# 3. Instance profile - the actual "container" EC2 uses to hold the role
+resource "aws_iam_instance_profile" "s3_readonly_profile" {
+  name = "S3ReadOnlyAccessEC2-profile"
+  role = aws_iam_role.s3_readonly_access_ec2.name
+}
+
+# ---------------------------------------------------
 # EC2 - CMS INSTANCE
 # ---------------------------------------------------
 resource "aws_instance" "mtsai_cms" {
@@ -188,10 +226,28 @@ resource "aws_instance" "mtsai_cms" {
   key_name               = "siby-ec2-key-pair"
   subnet_id              = aws_subnet.private_subnet_2.id
   vpc_security_group_ids = [aws_security_group.cms_sg.id]
+  iam_instance_profile   = aws_iam_instance_profile.s3_readonly_profile.name
 
   tags = {
     Name = "mtsai-cms"
   }
+}
+
+# ---------------------------------------------------
+# S3 BUCKET - for mtsai-cms
+# ---------------------------------------------------
+resource "aws_s3_bucket" "mtsai_cms_bucket" {
+  bucket = "mtsai-cms-bucket-${data.aws_caller_identity.current.account_id}"
+
+  tags = {
+    Name = "mtsai-cms-bucket"
+  }
+}
+
+data "aws_caller_identity" "current" {}
+
+output "cms_bucket_name" {
+  value = aws_s3_bucket.mtsai_cms_bucket.bucket
 }
 
 # ---------------------------------------------------
