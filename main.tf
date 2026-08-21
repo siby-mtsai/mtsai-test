@@ -128,7 +128,7 @@ resource "aws_route_table_association" "private_assoc_2" {
 # =====================================================
 resource "aws_security_group" "cms_sg" {
   name        = "${var.project_name}-cms-sg"
-  description = "Allow SSH, HTTP, HTTPS, and Payload default port to the CMS instance"
+  description = "CMS security group"
   vpc_id      = aws_vpc.main.id
 
   ingress {
