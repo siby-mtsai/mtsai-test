@@ -264,7 +264,6 @@ resource "aws_instance" "bastion" {
   key_name               = "siby-ec2-key-pair"
   subnet_id              = aws_subnet.public_subnet.id
   vpc_security_group_ids = [aws_security_group.bastion_sg.id]
-  availability_zone      = "ap-south-1b"
 
   timeouts {
     create = "15m"
