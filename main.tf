@@ -94,6 +94,33 @@ resource "aws_db_subnet_group" "mtsai_db_subnets" {
 # ---------------------------------------------------
 # SECURITY GROUPS
 # ---------------------------------------------------
+
+# NEW: bastion security group
+resource "aws_security_group" "bastion_sg" {
+  name        = "mtsai-bastion-sg"
+  description = "Allow SSH from internet to bastion"
+  vpc_id      = aws_vpc.mtsai_vpc.id
+
+  ingress {
+    description = "SSH"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "mtsai-bastion-sg"
+  }
+}
+
 resource "aws_security_group" "cms_sg" {
   name        = "mtsai-cms-sg"
   description = "Allow access to CMS EC2 instance"
@@ -150,32 +177,6 @@ resource "aws_security_group" "rds_sg" {
 
   tags = {
     Name = "mtsai-rds-sg"
-  }
-}
-
-# NEW: bastion security group
-resource "aws_security_group" "bastion_sg" {
-  name        = "mtsai-bastion-sg"
-  description = "Allow SSH from internet to bastion"
-  vpc_id      = aws_vpc.mtsai_vpc.id
-
-  ingress {
-    description = "SSH"
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  tags = {
-    Name = "mtsai-bastion-sg"
   }
 }
 
