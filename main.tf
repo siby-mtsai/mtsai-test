@@ -388,7 +388,7 @@ resource "aws_s3_bucket_public_access_block" "static_site_block" {
 }
 
 resource "aws_s3_bucket_policy" "static_site_policy" {
-  bucket = aws_s3_bucket.static_site.id
+  bucket     = aws_s3_bucket.static_site.id
   depends_on = [aws_s3_bucket_public_access_block.static_site_block]
 
   policy = jsonencode({
