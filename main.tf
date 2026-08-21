@@ -232,6 +232,10 @@ resource "aws_instance" "mtsai_cms" {
   tags = {
     Name = "mtsai-cms"
   }
+
+  timeouts {
+    create = "20m"
+  }
 }
 
 # ---------------------------------------------------
