@@ -6,37 +6,6 @@ provider "aws" {
 }
 
 # =====================================================
-# VARIABLES
-# =====================================================
-variable "aws_region" {
-  default = "ap-south-1"
-}
-
-variable "project_name" {
-  default = "blogcms"
-}
-
-variable "key_name" {
-  description = "Name of an EXISTING EC2 key pair you created manually in the AWS console"
-  type        = string
-}
-
-variable "db_username" {
-  default = "payloadadmin"
-}
-
-variable "db_password" {
-  description = "Password for the RDS Postgres instance. Pass via terraform.tfvars or -var, do not hardcode."
-  type        = string
-  sensitive   = true
-}
-
-variable "allowed_ssh_cidr" {
-  description = "CIDR allowed to SSH/HTTP into the CMS instance. Restrict this to your own IP (e.g. 1.2.3.4/32) for better security."
-  default     = "0.0.0.0/0"
-}
-
-# =====================================================
 # VPC + SUBNETS
 # =====================================================
 resource "aws_vpc" "main" {
@@ -403,23 +372,4 @@ resource "aws_s3_bucket_policy" "static_site_policy" {
       }
     ]
   })
-}
-
-# =====================================================
-# OUTPUTS
-# =====================================================
-output "cms_public_ip" {
-  value = aws_instance.cms.public_ip
-}
-
-output "rds_endpoint" {
-  value = aws_db_instance.payload_db.endpoint
-}
-
-output "media_bucket_name" {
-  value = aws_s3_bucket.media_bucket.bucket
-}
-
-output "static_site_endpoint" {
-  value = aws_s3_bucket_website_configuration.static_site_config.website_endpoint
 }
