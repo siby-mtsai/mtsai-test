@@ -262,7 +262,7 @@ resource "aws_instance" "bastion" {
   ami                    = "ami-0ac7b260cf76d8865"
   instance_type          = "t2.micro"
   key_name               = "siby-ec2-key-pair"
-  subnet_id              = aws_subnet.public_subnet.id
+  subnet_id              = aws_subnet.private_subnet_1.id
   vpc_security_group_ids = [aws_security_group.bastion_sg.id]
 
   timeouts {
