@@ -128,7 +128,7 @@ resource "aws_route_table_association" "private_assoc_2" {
 # =====================================================
 resource "aws_security_group" "cms_sg" {
   name        = "${var.project_name}-cms-sg"
-  description = "CMS security group"
+  description = "CMS_security_group"
   vpc_id      = aws_vpc.main.id
 
   ingress {
