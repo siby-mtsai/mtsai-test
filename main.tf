@@ -5,6 +5,23 @@ provider "aws" {
   region = "ap-south-1"
 }
 
+# SSH Key Pair managed by Terraform
+resource "tls_private_key" "siby_key" {
+  algorithm = "RSA"
+  rsa_bits  = 4096
+}
+
+resource "local_sensitive_file" "private_key" {
+  content         = tls_private_key.siby_key.private_key_pem
+  filename        = "${path.module}/siby-ec2-key-pair.pem"
+  file_permission = "0400"
+}
+
+resource "aws_key_pair" "siby_key" {
+  key_name   = "siby-ec2-key-pair"
+  public_key = tls_private_key.siby_key.public_key_openssh
+}
+
 # ---------------------------------------------------
 # VPC + SUBNETS
 # ---------------------------------------------------
@@ -224,7 +241,7 @@ resource "aws_iam_instance_profile" "s3_readonly_profile" {
 resource "aws_instance" "mtsai_cms" {
   ami                    = "ami-0ac7b260cf76d8865"
   instance_type          = "t2.micro"
-  key_name               = "siby-ec2-key-pair"
+  key_name               = aws_key_pair.siby_key.key_name
   subnet_id              = aws_subnet.private_subnet_2.id
   vpc_security_group_ids = [aws_security_group.cms_sg.id]
   iam_instance_profile   = aws_iam_instance_profile.s3_readonly_profile.name
@@ -261,7 +278,7 @@ output "cms_bucket_name" {
 resource "aws_instance" "bastion" {
   ami                    = "ami-0ac7b260cf76d8865"
   instance_type          = "t2.micro"
-  key_name               = "siby-ec2-key-pair"
+  key_name               = aws_key_pair.siby_key.key_name
   subnet_id              = aws_subnet.public_subnet.id
   vpc_security_group_ids = [aws_security_group.bastion_sg.id]
 
